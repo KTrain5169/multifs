@@ -1,9 +1,5 @@
 import type { BaseInterface, DirectoryListing, DriverInterface } from "./types.ts";
 
-export function fn() {
-  return "Hello, tsdown!";
-}
-
 export class FS<const Raw> implements BaseInterface {
   private readonly driver: DriverInterface<Raw>;
   readonly base?: string;
