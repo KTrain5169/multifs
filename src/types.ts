@@ -2,6 +2,7 @@ export interface BaseInterface {
   read(filePath: string, options?: {}): Promise<Blob>;
   write(filePath: string, contents: Blob, options?: {}): Promise<void>;
   ls(dir: string, options?: {}): Promise<DirectoryListing>;
+  stat(filePath: string): Promise<AllStat>;
 }
 
 export interface DriverInterface<Raw = unknown> extends BaseInterface {
@@ -12,20 +13,24 @@ export interface DirectoryListing {
   [key: string]: AllStat;
 }
 
-interface BaseStat {
+export interface BaseStat {
   type: string;
 }
 
-interface FileStat extends BaseStat {
+export interface FileStat extends BaseStat {
   type: "file";
-  contents: Blob;
+  checksums: {
+    sha1: string;
+    sha256: string;
+    sha512: string;
+  };
 }
 
-interface FolderStat extends BaseStat {
+export interface FolderStat extends BaseStat {
   type: "folder";
-  contents: {
+  children: {
     [key: string]: AllStat;
   };
 }
 
-type AllStat = FileStat | FolderStat;
+export type AllStat = FileStat | FolderStat;

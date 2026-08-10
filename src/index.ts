@@ -1,4 +1,4 @@
-import type { BaseInterface, DirectoryListing, DriverInterface } from "./types.ts";
+import type { AllStat, BaseInterface, DirectoryListing, DriverInterface } from "./types.ts";
 
 export class FS<const Raw> implements BaseInterface {
   private readonly driver: DriverInterface<Raw>;
@@ -29,5 +29,9 @@ export class FS<const Raw> implements BaseInterface {
 
   ls(dir: string, options?: {}): Promise<DirectoryListing> {
     return this.driver.ls(dir, options);
+  }
+
+  stat(filePath: string): Promise<AllStat> {
+    return this.driver.stat(filePath);
   }
 }
