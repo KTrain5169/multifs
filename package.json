@@ -1,16 +1,16 @@
 {
   "name": "multifs",
   "version": "0.0.0",
-  "description": "A starter for creating a TypeScript package.",
-  "homepage": "https://github.com/author/library#readme",
+  "description": "A runtime-agnostic package to manipulate filesystem-like environments through a unified interface.",
+  "homepage": "https://github.com/KTrain5169/multifs#readme",
   "bugs": {
-    "url": "https://github.com/author/library/issues"
+    "url": "https://github.com/KTrain5169/multifs/issues"
   },
   "license": "MIT",
-  "author": "Author Name <author.name@mail.com>",
+  "author": "KTrain5369",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/author/library.git"
+    "url": "git+https://github.com/KTrain5169/multifs.git"
   },
   "files": [
     "dist"
@@ -30,6 +30,9 @@
     "check": "vp check",
     "prepublishOnly": "vp run build",
     "prepare": "vp config"
+  },
+  "dependencies": {
+    "memfs": "^4.68.1"
   },
   "devDependencies": {
     "@cloudflare/workers-types": "^5.20260809.1",
