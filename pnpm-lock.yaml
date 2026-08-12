@@ -219,6 +219,9 @@ importers:
       memfs:
         specifier: ^4.68.1
         version: 4.68.1
+      pathe:
+        specifier: ^2.0.3
+        version: 2.0.3
     devDependencies:
       '@cloudflare/workers-types':
         specifier: ^5.20260809.1

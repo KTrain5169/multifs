@@ -32,7 +32,8 @@
     "prepare": "vp config"
   },
   "dependencies": {
-    "memfs": "^4.68.1"
+    "memfs": "^4.68.1",
+    "pathe": "^2.0.3"
   },
   "devDependencies": {
     "@cloudflare/workers-types": "^5.20260809.1",
