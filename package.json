@@ -32,6 +32,7 @@
     "prepare": "vp config"
   },
   "dependencies": {
+    "cloudflare": "^7.0.0",
     "memfs": "^4.68.1",
     "pathe": "^2.0.3"
   },

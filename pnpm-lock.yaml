@@ -216,6 +216,9 @@ importers:
 
   .:
     dependencies:
+      cloudflare:
+        specifier: ^7.0.0
+        version: 7.0.0
       memfs:
         specifier: ^4.68.1
         version: 4.68.1
@@ -1127,6 +1130,10 @@ packages:
   chai@6.2.2:
     resolution: {integrity: sha512-NUPRluOfOiTKBKvWPtSD4PhFvWCqOi0BGStNWs57X9js7XGTprSmFoz5F0tWhR4WPjNeR9jXqdC7/UpSJTnlRg==}
     engines: {node: '>=18'}
+
+  cloudflare@7.0.0:
+    resolution: {integrity: sha512-ZU8Yp1biaRRf+i1Hlap/VUwSBeKnOa4kkygIU9naE07JILnHdgLr9Wq/iPEeEf2in0N5m1giTp1ohY+cNQZEGQ==}
+    hasBin: true
 
   convert-source-map@2.0.0:
     resolution: {integrity: sha512-Kvp459HrV2FEJ1CAsi1Ku+MY3kasH19TFykTz2xWmMeq6bk2NU3XXvfJ+Q61m0xktWwt+1HSYf3JZsTms3aRJg==}
@@ -2097,6 +2104,8 @@ snapshots:
   cac@7.0.0: {}
 
   chai@6.2.2: {}
+
+  cloudflare@7.0.0: {}
 
   convert-source-map@2.0.0: {}
 
