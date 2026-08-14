@@ -82,6 +82,22 @@ export class FS<const Raw> implements BaseInterface {
     return driver.write(path, contents, options);
   }
 
+  delete(filePath: string, options?: { recursive?: boolean }): Promise<void> {
+    const mounted = this.resolveMountedPath(filePath);
+    const driver = mounted?.driver ?? this.driver;
+
+    let path: string;
+    if (mounted) {
+      path = mounted.path;
+    } else if (this.base) {
+      path = resolve(this.base, filePath);
+    } else {
+      path = resolve(filePath);
+    }
+
+    return driver.delete(path, options);
+  }
+
   ls(dir: string, options?: {}): Promise<DirectoryListing> {
     const mounted = this.resolveMountedPath(dir);
     const driver = mounted?.driver ?? this.driver;
