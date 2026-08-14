@@ -2,7 +2,7 @@ import { resolve } from "pathe";
 
 import type { AllStat, BaseInterface, DirectoryListing, DriverInterface } from "./types.ts";
 
-export class FS<const Raw> implements BaseInterface {
+export class MultiFS<const Raw> implements BaseInterface {
   private readonly driver: DriverInterface<Raw>;
   private readonly mounts: Record<string, BaseInterface> = {};
   private readonly base?: string;
