@@ -4,7 +4,7 @@ export interface BaseInterface {
   delete(filePath: string, options?: { recursive?: boolean }): Promise<void>;
   ls(dir: string, options?: {}): Promise<DirectoryListing>;
   stat(filePath: string): Promise<AllStat>;
-  createMultipartUpload?(filePath: string, content: Blob, options?: {}): Promise<{}>;
+  createMultipartUpload?(filePath: string, options?: {}): Promise<MultipartUpload>;
   resumeMultipartUpload?(uploadId: string, content: Blob): Promise<void>;
 }
 
@@ -22,6 +22,7 @@ export interface UploadedMultiparts {
 }
 
 export interface DriverInterface<Raw = unknown> extends BaseInterface {
+  name: string;
   raw: Raw;
 }
 

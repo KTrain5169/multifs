@@ -1,11 +1,18 @@
 import { resolve } from "pathe";
 
-import type { AllStat, BaseInterface, DirectoryListing, DriverInterface } from "./types.ts";
+import type {
+  AllStat,
+  BaseInterface,
+  DirectoryListing,
+  DriverInterface,
+  MultipartUpload,
+} from "./types.ts";
 
 export class MultiFS<const Raw> implements BaseInterface {
   private readonly driver: DriverInterface<Raw>;
   private readonly mounts: Record<string, BaseInterface> = {};
   private readonly base?: string;
+  private readonly currentMultipartUploads: Record<string, BaseInterface> = {};
 
   constructor(driver: DriverInterface<Raw>);
   constructor(base: string, driver: DriverInterface<Raw>);
@@ -138,5 +145,52 @@ export class MultiFS<const Raw> implements BaseInterface {
     } else {
       this.mounts[normalizedPath] = driver;
     }
+  }
+
+  async createMultipartUpload(
+    filePath: string,
+    content: Blob,
+    options?: {},
+  ): Promise<MultipartUpload> {
+    const mounted = this.resolveMountedPath(filePath);
+    const driver = mounted?.driver ?? this.driver;
+
+    let path: string;
+    if (mounted) {
+      path = mounted.path;
+    } else if (this.base) {
+      path = resolve(this.base, filePath);
+    } else {
+      path = resolve(filePath);
+    }
+
+    if (!driver.createMultipartUpload || !driver.resumeMultipartUpload) {
+      if ("name" in driver) {
+        throw new Error(
+          `Multipart uploads are not supported by the driver "${String(driver.name)}".`,
+        );
+      } else {
+        throw new Error(`The mounted driver for "${path}" does not support multipart uploads.`);
+      }
+    }
+
+    const upload = await driver.createMultipartUpload(path, options);
+    this.currentMultipartUploads[upload.uploadId] = driver;
+
+    return upload;
+  }
+
+  async resumeMultipartUpload(uploadId: string, content: Blob): Promise<void> {
+    const driver = this.currentMultipartUploads[uploadId];
+
+    if (!driver) {
+      throw new Error(`ID "${uploadId}" does not match a recorded multipart upload.`);
+    }
+
+    await driver.resumeMultipartUpload!(uploadId, content);
+  }
+
+  clearMultipartUploadReferences(uploadId: string): void {
+    delete this.currentMultipartUploads[uploadId];
   }
 }
