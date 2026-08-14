@@ -1,6 +1,17 @@
 import { defineConfig } from "vite-plus";
 
 export default defineConfig({
+  run: {
+    tasks: {
+      build: "vp pack",
+      dev: {
+        command: "vp pack --watch",
+        cache: false,
+      },
+      test: "vp test",
+      check: "vp check",
+    },
+  },
   staged: {
     "*": "vp check --fix",
   },
