@@ -6,6 +6,8 @@ import type {
   DirectoryListing,
   DriverInterface,
   MultipartUpload,
+  WatchContext,
+  Watcher,
 } from "./types.ts";
 
 export class MultiFS<const Raw> implements BaseInterface {
@@ -121,7 +123,7 @@ export class MultiFS<const Raw> implements BaseInterface {
     return driver.ls(path, options);
   }
 
-  stat(filePath: string): Promise<AllStat> {
+  stat(filePath: string, options?: {}): Promise<AllStat> {
     const mounted = this.resolveMountedPath(filePath);
     const driver = mounted?.driver ?? this.driver;
 
@@ -134,7 +136,43 @@ export class MultiFS<const Raw> implements BaseInterface {
       path = resolve(filePath);
     }
 
-    return driver.stat(path);
+    return driver.stat(path, options);
+  }
+
+  watch(
+    filePath: string,
+    listener: (ctx: WatchContext) => void | Promise<void>,
+    options?: {},
+  ): Watcher {
+    const mounted = this.resolveMountedPath(filePath);
+    const driver = mounted?.driver ?? this.driver;
+
+    let path: string;
+    if (mounted) {
+      path = mounted.path;
+    } else if (this.base) {
+      path = resolve(this.base, filePath);
+    } else {
+      path = resolve(filePath);
+    }
+
+    return driver.watch(path, listener, options);
+  }
+
+  unwatch(filePath: string, options?: {}): void | Promise<void> {
+    const mounted = this.resolveMountedPath(filePath);
+    const driver = mounted?.driver ?? this.driver;
+
+    let path: string;
+    if (mounted) {
+      path = mounted.path;
+    } else if (this.base) {
+      path = resolve(this.base, filePath);
+    } else {
+      path = resolve(filePath);
+    }
+
+    return driver.unwatch(path, options);
   }
 
   mount(path: string, driver: BaseInterface, override = false) {
@@ -144,6 +182,16 @@ export class MultiFS<const Raw> implements BaseInterface {
       throw new Error("Mount already exists!");
     } else {
       this.mounts[normalizedPath] = driver;
+    }
+  }
+
+  unmount(path: string) {
+    const normalizedPath = this.base ? resolve(this.base, path) : resolve(path);
+
+    if (!this.mounts[normalizedPath]) {
+      return;
+    } else {
+      delete this.mounts[normalizedPath];
     }
   }
 
@@ -170,7 +218,9 @@ export class MultiFS<const Raw> implements BaseInterface {
           `Multipart uploads are not supported by the driver "${String(driver.name)}".`,
         );
       } else {
-        throw new Error(`The mounted driver for "${path}" does not support multipart uploads.`);
+        throw new Error(
+          `The mounted filesystem driver for "${path}" does not support multipart uploads.`,
+        );
       }
     }
 
@@ -193,4 +243,32 @@ export class MultiFS<const Raw> implements BaseInterface {
   clearMultipartUploadReferences(uploadId: string): void {
     delete this.currentMultipartUploads[uploadId];
   }
+
+  async dispose(): Promise<void> {
+    await this.driver.dispose();
+    for (const m in this.mounts) {
+      await this.mounts[m].dispose();
+    }
+    for (const r in this.currentMultipartUploads) {
+      this.clearMultipartUploadReferences(r);
+    }
+  }
 }
+
+interface DriverDependencies {
+  readonly [driver: string]: {
+    readonly [dep: string]: {
+      readonly version: string;
+      readonly optional?: boolean;
+    };
+  };
+}
+
+export const driverDependencies: DriverDependencies = {
+  nodejs: {
+    chokidar: {
+      version: "^1.1.7",
+      optional: true,
+    },
+  },
+} as const;

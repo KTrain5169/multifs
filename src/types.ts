@@ -3,9 +3,22 @@ export interface BaseInterface {
   write(filePath: string, contents: Blob, options?: {}): Promise<void>;
   delete(filePath: string, options?: { recursive?: boolean }): Promise<void>;
   ls(dir: string, options?: {}): Promise<DirectoryListing>;
-  stat(filePath: string): Promise<AllStat>;
+  stat(filePath: string, options?: {}): Promise<AllStat>;
+  watch(path: string, listener: (ctx: WatchContext) => void | Promise<void>, options?: {}): Watcher;
+  unwatch(path: string, options?: {}): void | Promise<void>;
   createMultipartUpload?(filePath: string, options?: {}): Promise<MultipartUpload>;
   resumeMultipartUpload?(uploadId: string, content: Blob): Promise<void>;
+  dispose(): void | Promise<void>;
+}
+
+export interface Watcher {
+  readonly listener: (ctx: WatchContext) => void | Promise<void>;
+  stop(): void | Promise<void>;
+}
+
+export interface WatchContext {
+  readonly filePath: string;
+  readonly time: Date;
 }
 
 export interface MultipartUpload {
