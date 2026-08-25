@@ -1,18 +1,22 @@
 export interface BaseInterface {
-  read(filePath: string, options?: {}): Promise<Blob>;
-  write(filePath: string, contents: Blob, options?: {}): Promise<void>;
+  read(filePath: string, options?: {}): Promise<Blob | undefined>;
+  write(filePath: string, contents: Blob, options?: { recursive?: boolean }): Promise<void>;
   delete(filePath: string, options?: { recursive?: boolean }): Promise<void>;
   ls(dir: string, options?: {}): Promise<DirectoryListing>;
   stat(filePath: string, options?: {}): Promise<AllStat>;
-  watch(path: string, listener: (ctx: WatchContext) => void | Promise<void>, options?: {}): Watcher;
+  watch(path: string, listener: FileWatchListener, options?: {}): Watcher;
   unwatch(path: string, options?: {}): void | Promise<void>;
   createMultipartUpload?(filePath: string, options?: {}): Promise<MultipartUpload>;
   resumeMultipartUpload?(uploadId: string, content: Blob): Promise<void>;
   dispose(): void | Promise<void>;
 }
 
+export interface FileWatchListener {
+  (ctx: WatchContext): void | Promise<void>;
+}
+
 export interface Watcher {
-  readonly listener: (ctx: WatchContext) => void | Promise<void>;
+  readonly listener: FileWatchListener;
   stop(): void | Promise<void>;
 }
 
